@@ -28,17 +28,23 @@ def load_csv(path: Path) -> pd.DataFrame:
 
 
 def get_available_leagues(base_path: Path = BASE_ANALYSIS_PATH) -> Dict[str, Path]:
-    """Restituisce un dizionario {nome_lega: percorso_cartella}."""
-
+    """Adatta la lettura dei CSV per ambiente GitHub (senza sottocartelle)."""
     leagues: Dict[str, Path] = {}
-    if not base_path.exists():
+
+    # Caso 1: struttura locale (con sottocartelle)
+    subfolders = [f for f in base_path.iterdir() if f.is_dir()]
+    if subfolders:
+        for child in sorted(subfolders):
+            leagues[child.name] = child
         return leagues
 
-    for child in sorted(base_path.iterdir()):
-        if child.is_dir():
-            leagues[child.name] = child
+    # Caso 2: ambiente GitHub (solo file diretti)
+    csv_files = list(base_path.glob("*.csv"))
+    if csv_files:
+        leagues["default"] = base_path
 
     return leagues
+
 
 
 def format_percentage_columns(df: pd.DataFrame) -> pd.DataFrame:
@@ -193,6 +199,7 @@ with cols[1]:
             st.write(f"- {outcome.replace('_', ' ').title()}: {value:.2f}%")
     else:
         st.write("Nessuna media calcolabile per gli esiti selezionati.")
+
 
 
 
