@@ -5,8 +5,39 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Dict, List, Optional
 
-import pandas as pd
 import streamlit as st
+import pandas as pd
+import altair as alt
+
+st.set_page_config(page_title="Football AI 2.0", layout="wide")
+
+st.title("⚽ Football AI 2.0")
+st.subheader("Analisi Esiti Storici – Dashboard interattiva")
+
+# Caricamento
+data = pd.read_csv("data/analisi_stagioni.csv")
+
+col1, col2, col3 = st.columns(3)
+col1.metric("📊 Partite analizzate", f"{int(data['total_matches'].sum()):,}".replace(",", "."))
+col2.metric("🔥 Media Over 2.5", f"{data['over_25_percentage'].mean():.2f}%")
+col3.metric("⚡ Media GG", f"{data['gg_percentage'].mean():.2f}%")
+
+st.markdown("---")
+
+# Grafico stagionale
+chart = alt.Chart(data).mark_line(point=True).encode(
+    x='season:O',
+    y='over_25_percentage:Q',
+    tooltip=['season', 'over_25_percentage']
+).properties(title="Andamento Over 2.5 per stagione", height=400)
+
+st.altair_chart(chart, use_container_width=True)
+
+st.markdown("### 📋 Tabella dati principali")
+st.dataframe(
+    data[["season", "over_25_percentage", "gg_percentage", "multigol_2_4_percentage"]],
+    use_container_width=True
+)
 
 
 BASE_ANALYSIS_PATH = Path("data").resolve()
@@ -199,6 +230,7 @@ with cols[1]:
             st.write(f"- {outcome.replace('_', ' ').title()}: {value:.2f}%")
     else:
         st.write("Nessuna media calcolabile per gli esiti selezionati.")
+
 
 
 
