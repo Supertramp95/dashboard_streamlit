@@ -9,7 +9,8 @@ import pandas as pd
 import streamlit as st
 
 
-BASE_ANALYSIS_PATH = Path("../football_ai_2_0/logs/analisi").resolve()
+BASE_ANALYSIS_PATH = Path("data").resolve()
+
 
 
 # ----------------------------------------------------------------------------
@@ -192,5 +193,6 @@ with cols[1]:
             st.write(f"- {outcome.replace('_', ' ').title()}: {value:.2f}%")
     else:
         st.write("Nessuna media calcolabile per gli esiti selezionati.")
+
 
 
